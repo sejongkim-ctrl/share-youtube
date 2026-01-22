@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>유튜브 썸네일 변환기 (OG Maker)</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding: 20px; background: #f0f0f0; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h2 { color: #333; }
+        
+        /* 업로드 버튼 스타일 */
+        .file-upload { margin: 20px 0; }
+        input[type=file] { display: none; }
+        .custom-upload {
+            background-color: #fee500; color: #3c1e1e; 
+            padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold;
+        }
+        
+        /* 캔버스 (미리보기) */
+        canvas { 
+            max-width: 100%; height: auto; 
+            border: 1px solid #ddd; margin-top: 20px; 
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        /* 다운로드 버튼 */
+        #downloadBtn {
+            display: none; margin-top: 20px;
+            background-color: #333; color: white;
+            padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>📸 카톡 공유용 이미지 변환기</h2>
+    <p>세로 이미지를 올리면 가로형(1200x630)으로 자동 변환됩니다.</p>
+
+    <div class="file-upload">
+        <label for="imgInput" class="custom-upload">📂 이미지 업로드하기</label>
+        <input type="file" id="imgInput" accept="image/*">
+    </div>
+
+    <canvas id="canvas" width="1200" height="630"></canvas>
+    <br>
+    <a id="downloadBtn" download="og_image.jpg">💾 이미지 다운로드</a>
+</div>
+
+<script>
+    const imgInput = document.getElementById('imgInput');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const downloadBtn = document.getElementById('downloadBtn');
+
+    imgInput.addEventListener('change', function(e) {
+        if(e.target.files && e.target.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = function() {
+                    drawCanvas(img);
+                }
+                img.src = event.target.result;
+            }
+            reader.readAsDataURL(e.target.files[0]);
+        }
+    });
+
+    function drawCanvas(img) {
+        // 1. 배경 채우기 (블러 효과 흉내 - 이미지를 확대해서 그림)
+        // 캔버스 크기
+        const cw = canvas.width;
+        const ch = canvas.height;
+        
+        // 배경: 이미지를 캔버스 너비에 맞춰 꽉 차게 그림 (비율 유지하며 크롭됨)
+        const scaleBg = Math.max(cw / img.width, ch / img.height);
+        const bgWidth = img.width * scaleBg;
+        const bgHeight = img.height * scaleBg;
+        const bgX = (cw - bgWidth) / 2;
+        const bgY = (ch - bgHeight) / 2;
+
+        // 블러 필터 적용 후 배경 그리기
+        ctx.filter = 'blur(20px) brightness(0.7)'; // 흐리게 + 약간 어둡게
+        ctx.drawImage(img, bgX, bgY, bgWidth, bgHeight);
+        
+        // 필터 해제 (중앙 이미지는 선명해야 함)
+        ctx.filter = 'none';
+
+        // 2. 중앙에 원본 세로 이미지 그리기 (화면 높이에 맞춤)
+        const scaleFg = ch / img.height; // 높이를 캔버스에 맞춤
+        // 만약 이미지가 너무 뚱뚱하면 너비 기준으로 맞춤 (안전장치)
+        const scaleFinal = Math.min(scaleFg, (cw * 0.9) / img.width); 
+
+        const fgWidth = img.width * scaleFinal;
+        const fgHeight = img.height * scaleFinal;
+        const fgX = (cw - fgWidth) / 2;
+        const fgY = (ch - fgHeight) / 2;
+
+        // 그림자 효과 (중앙 이미지 강조)
+        ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
+        ctx.shadowBlur = 20;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 0;
+
+        ctx.drawImage(img, fgX, fgY, fgWidth, fgHeight);
+
+        // 3. 다운로드 버튼 활성화
+        downloadBtn.style.display = 'inline-block';
+        
+        // 캔버스 내용을 이미지 URL로 변환하여 다운로드 링크에 연결
+        downloadBtn.href = canvas.toDataURL('image/jpeg', 0.9);
+    }
+</script>
+
+</body>
+</html>
