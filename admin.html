@@ -3,16 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>👑 올인원 링크 마스터</title>
+    <title>👑 올인원 링크 마스터 (붙여넣기 지원)</title>
     <style>
-        body { font-family: 'Pretendard', sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; background: #f4f6f8; color: #333; }
+        body { font-family: 'Pretendard', sans-serif; max-width: 900px; margin: 0 auto; padding: 20px; background: #f4f6f8; color: #333; }
         .container { display: flex; flex-wrap: wrap; gap: 20px; }
         
-        /* 왼쪽: 입력 폼 */
-        .input-section { flex: 1; min-width: 300px; background: white; padding: 25px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        
-        /* 오른쪽: 미리보기 및 결과 */
-        .preview-section { flex: 1; min-width: 300px; background: white; padding: 25px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); text-align: center; }
+        .input-section { flex: 1; min-width: 320px; background: white; padding: 25px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .preview-section { flex: 1; min-width: 320px; background: white; padding: 25px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); text-align: center; }
 
         h2 { margin-top: 0; color: #1a1a1a; font-size: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
         
@@ -20,46 +17,56 @@
         input[type="text"], input[type="file"] { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
         input:focus { border-color: #007aff; outline: none; }
         
-        /* 파일 업로드 디자인 */
-        .file-box { background: #f9f9f9; padding: 15px; border-radius: 8px; border: 2px dashed #ddd; text-align: center; margin-top: 5px; cursor: pointer; }
-        .file-box:hover { border-color: #007aff; background: #eef7ff; }
+        /* 파일 업로드 박스 디자인 (강조됨) */
+        .file-box { 
+            background: #f0f7ff; padding: 20px; border-radius: 8px; 
+            border: 2px dashed #007aff; text-align: center; margin-top: 5px; 
+            cursor: pointer; color: #0056b3; transition: 0.2s;
+        }
+        .file-box:hover { background: #e0efff; }
+        .file-box.active { background: #d4edda; border-color: #28a745; color: #155724; }
 
-        /* 버튼 */
         .btn-action { width: 100%; padding: 15px; margin-top: 20px; border: none; border-radius: 10px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.2s; }
-        .btn-blue { background: #007aff; color: white; } /* 생성 버튼 */
+        .btn-blue { background: #007aff; color: white; }
         .btn-blue:hover { background: #0056b3; }
         
-        .btn-green { background: #2dba4e; color: white; margin-top: 10px; } /* 깃허브 버튼 */
-        .btn-dark { background: #333; color: white; margin-top: 5px; } /* 이미지 다운로드 */
+        .btn-green { background: #2dba4e; color: white; margin-top: 10px; } 
+        .btn-dark { background: #333; color: white; margin-top: 5px; } 
 
-        /* 결과 영역 */
         #resultArea { display: none; margin-top: 20px; padding-top: 20px; border-top: 2px dashed #eee; }
         canvas { max-width: 100%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 10px; }
         
         .code-box { background: #222; color: #81e6d9; padding: 10px; border-radius: 6px; font-family: monospace; font-size: 12px; text-align: left; height: 80px; overflow-y: scroll; margin-bottom: 10px; }
+        
+        /* 토스트 메시지 (복사 알림) */
+        #toast { visibility: hidden; min-width: 250px; margin-left: -125px; background-color: #333; color: #fff; text-align: center; border-radius: 2px; padding: 16px; position: fixed; z-index: 1; left: 50%; bottom: 30px; font-size: 17px; }
+        #toast.show { visibility: visible; -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
+        
+        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
+        @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
     </style>
 </head>
 <body>
 
 <div style="text-align: center; margin-bottom: 20px;">
-    <h1>👑 올인원 링크 마스터</h1>
-    <p>이미지 변환부터 코드 생성까지 한 번에 처리하세요.</p>
+    <h1>👑 올인원 링크 마스터 V3</h1>
+    <p>화면 아무 곳이나 클릭하고 <strong>[Ctrl + V]</strong>로 이미지를 붙여넣으세요!</p>
 </div>
 
 <div class="container">
     <div class="input-section">
         <h2>📝 정보 입력</h2>
         
-        <label>1. 세로형 이미지 업로드</label>
-        <div class="file-box" onclick="document.getElementById('imgInput').click()">
-            📂 클릭해서 이미지 선택 (세로형)
+        <label>1. 세로형 이미지 (클릭 or 붙여넣기)</label>
+        <div id="dropZone" class="file-box" onclick="document.getElementById('imgInput').click()">
+            📋 <strong>Ctrl + V</strong> 로 붙여넣기<br>
+            <span style="font-size:12px; font-weight:normal;">(또는 클릭해서 파일 선택)</span>
         </div>
         <input type="file" id="imgInput" accept="image/*" style="display: none;">
 
         <label>2. 폴더 이름 (영문/숫자)</label>
         <input type="text" id="folderName" placeholder="예: event1">
-        <p style="font-size:12px; color:#888;">* 이 이름이 링크 주소가 됩니다.</p>
-
+        
         <label>3. 유튜브 영상 링크</label>
         <input type="text" id="youtubeLink" placeholder="https://youtu.be/...">
 
@@ -74,9 +81,8 @@
 
     <div class="preview-section">
         <h2>👀 미리보기 & 다운로드</h2>
-        
         <canvas id="canvas" width="1200" height="630"></canvas>
-        <p id="waitMsg" style="color:#999;">왼쪽에서 정보를 입력하고<br>버튼을 눌러주세요.</p>
+        <p id="waitMsg" style="color:#999; margin-top:20px;">이미지가 없습니다.<br>캡쳐 후 <strong>Ctrl+V</strong> 하세요!</p>
 
         <div id="resultArea">
             <a id="downloadLink" class="btn-action btn-dark" style="display:block; text-decoration:none; line-height: 20px;">
@@ -91,47 +97,68 @@
             <button class="btn-action btn-green" onclick="goToGithub()">
                 🚀 3. 깃허브 가서 붙여넣기
             </button>
-            
-            <p style="font-size:12px; color:#666; margin-top:10px;">
-                * 깃허브에서 <strong>[Ctrl+V]</strong>로 코드를 붙여넣고,<br>
-                방금 다운로드한 <strong>이미지도 같이 업로드</strong> 해주세요.
-            </p>
         </div>
     </div>
 </div>
+
+<div id="toast">이미지가 붙여넣기 되었습니다! 📸</div>
 
 <script>
     const imgInput = document.getElementById('imgInput');
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
+    const dropZone = document.getElementById('dropZone');
     let isImageReady = false;
 
-    // 이미지 선택 시 미리보기 처리
-    imgInput.addEventListener('change', function(e) {
-        if(e.target.files && e.target.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                const img = new Image();
-                img.onload = function() {
-                    drawCanvas(img);
-                    isImageReady = true;
-                    document.querySelector('.file-box').innerText = "✅ " + e.target.files[0].name;
-                }
-                img.src = event.target.result;
+    // [핵심] 붙여넣기(Paste) 이벤트 감지
+    document.addEventListener('paste', function(e) {
+        const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+        
+        for (let index in items) {
+            const item = items[index];
+            if (item.kind === 'file' && item.type.indexOf('image/') !== -1) {
+                const blob = item.getAsFile();
+                handleImageFile(blob); // 이미지 처리 함수 호출
+                showToast("이미지가 붙여넣기 되었습니다! 📸");
+                break; // 이미지가 여러 개라도 첫 번째만 처리
             }
-            reader.readAsDataURL(e.target.files[0]);
         }
     });
 
+    // 파일 선택(클릭) 시 처리
+    imgInput.addEventListener('change', function(e) {
+        if(e.target.files && e.target.files[0]) {
+            handleImageFile(e.target.files[0]);
+        }
+    });
+
+    // 공통 이미지 처리 로직
+    function handleImageFile(file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            const img = new Image();
+            img.onload = function() {
+                drawCanvas(img);
+                isImageReady = true;
+                // UI 업데이트
+                dropZone.innerHTML = "✅ <strong>이미지 등록 완료!</strong><br><span style='font-size:12px'>다른 이미지를 붙여넣으려면 다시 Ctrl+V 하세요</span>";
+                dropZone.classList.add('active');
+            }
+            img.src = event.target.result;
+        }
+        reader.readAsDataURL(file);
+    }
+
     function drawCanvas(img) {
-        // 배경 블러 처리 및 합성 로직
         const cw = canvas.width; const ch = canvas.height;
+        
+        // 배경 블러
         const scaleBg = Math.max(cw / img.width, ch / img.height);
         const bgW = img.width * scaleBg; const bgH = img.height * scaleBg;
-        
         ctx.filter = 'blur(20px) brightness(0.7)';
         ctx.drawImage(img, (cw - bgW) / 2, (ch - bgH) / 2, bgW, bgH);
         
+        // 중앙 이미지
         ctx.filter = 'none';
         const scaleFg = Math.min(ch / img.height, (cw * 0.9) / img.width);
         const fgW = img.width * scaleFg; const fgH = img.height * scaleFg;
@@ -148,16 +175,16 @@
         const title = document.getElementById('ogTitle').value.trim();
         const desc = document.getElementById('ogDesc').value.trim();
 
-        if(!isImageReady) { alert('이미지를 먼저 업로드해주세요!'); return; }
+        if(!isImageReady) { alert('이미지가 없습니다! 화면을 클릭하고 Ctrl+V 하세요.'); return; }
         if(!folder || !youtube) { alert('폴더 이름과 유튜브 링크를 입력해주세요!'); return; }
 
-        // 1. 이미지 다운로드 링크 생성
+        // 다운로드 설정
         const dataURL = canvas.toDataURL('image/jpeg', 0.9);
         const downloadBtn = document.getElementById('downloadLink');
         downloadBtn.href = dataURL;
-        downloadBtn.download = 'og_image.jpg'; // 파일명 고정
+        downloadBtn.download = 'og_image.jpg';
 
-        // 2. HTML 코드 생성
+        // 코드 생성
         const htmlCode = `<!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -175,13 +202,10 @@
 </html>`;
 
         document.getElementById('codeDisplay').innerText = htmlCode;
-        
-        // 3. 클립보드 복사
         navigator.clipboard.writeText(htmlCode);
-        
-        // 4. 결과창 표시
         document.getElementById('resultArea').style.display = 'block';
-        alert('완료되었습니다!\n1. 이미지 다운로드 버튼 클릭\n2. 깃허브로 이동 버튼 클릭');
+        
+        alert('완료되었습니다! 버튼이 활성화되었습니다.');
     }
 
     function goToGithub() {
@@ -190,6 +214,13 @@
         const user = window.location.hostname.split('.')[0];
         const targetUrl = `https://github.com/${user}/${repoPath}/new/main/?filename=${folder}/index.html`;
         window.open(targetUrl, '_blank');
+    }
+
+    function showToast(msg) {
+        var x = document.getElementById("toast");
+        x.className = "show";
+        x.innerText = msg;
+        setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
     }
 </script>
 
