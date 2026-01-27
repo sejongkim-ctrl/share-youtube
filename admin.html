@@ -3,120 +3,161 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🔗 링크 생성 마법사 최종판</title>
+    <title>👑 올인원 링크 마스터</title>
     <style>
-        body { font-family: 'Pretendard', sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f0f2f5; }
-        .card { background: white; padding: 25px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-        h2 { text-align: center; color: #1a1a1a; margin-bottom: 20px; }
+        body { font-family: 'Pretendard', sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; background: #f4f6f8; color: #333; }
+        .container { display: flex; flex-wrap: wrap; gap: 20px; }
         
-        /* ▼ 상단 안내 문구 스타일 (요청하신 부분) */
-        .guide-box { 
-            background: #fff8c4; border: 1px solid #f2e085; 
-            padding: 15px; border-radius: 8px; margin-bottom: 25px; 
-            font-size: 14px; line-height: 1.5; color: #5c4b00;
-        }
-        .guide-box a { 
-            color: #d75e00; font-weight: bold; text-decoration: underline; 
-            cursor: pointer;
-        }
+        /* 왼쪽: 입력 폼 */
+        .input-section { flex: 1; min-width: 300px; background: white; padding: 25px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         
-        .input-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 6px; font-weight: 600; color: #444; font-size: 14px; }
-        input, textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 15px; transition: 0.2s; }
+        /* 오른쪽: 미리보기 및 결과 */
+        .preview-section { flex: 1; min-width: 300px; background: white; padding: 25px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); text-align: center; }
+
+        h2 { margin-top: 0; color: #1a1a1a; font-size: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        
+        label { display: block; margin-top: 15px; font-weight: 600; font-size: 14px; color: #555; }
+        input[type="text"], input[type="file"] { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
         input:focus { border-color: #007aff; outline: none; }
         
-        /* 버튼 스타일 */
-        .btn-main { width: 100%; padding: 16px; background: #007aff; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        .btn-main:hover { background: #0056b3; }
-        
-        .btn-sub { padding: 8px 12px; background: #eee; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; color: #555; }
+        /* 파일 업로드 디자인 */
+        .file-box { background: #f9f9f9; padding: 15px; border-radius: 8px; border: 2px dashed #ddd; text-align: center; margin-top: 5px; cursor: pointer; }
+        .file-box:hover { border-color: #007aff; background: #eef7ff; }
 
-        /* 결과 영역 (숨김) */
-        #resultArea { margin-top: 30px; padding-top: 20px; border-top: 2px dashed #eee; display: none; }
+        /* 버튼 */
+        .btn-action { width: 100%; padding: 15px; margin-top: 20px; border: none; border-radius: 10px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.2s; }
+        .btn-blue { background: #007aff; color: white; } /* 생성 버튼 */
+        .btn-blue:hover { background: #0056b3; }
         
-        .final-link-box { background: #e9f5ff; padding: 15px; border-radius: 8px; border: 1px solid #cce5ff; margin-bottom: 20px; }
-        .final-link-text { font-family: monospace; color: #0056b3; word-break: break-all; font-weight: bold; font-size: 14px; }
+        .btn-green { background: #2dba4e; color: white; margin-top: 10px; } /* 깃허브 버튼 */
+        .btn-dark { background: #333; color: white; margin-top: 5px; } /* 이미지 다운로드 */
+
+        /* 결과 영역 */
+        #resultArea { display: none; margin-top: 20px; padding-top: 20px; border-top: 2px dashed #eee; }
+        canvas { max-width: 100%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 10px; }
         
-        textarea#finalCode { height: 100px; background: #222; color: #81e6d9; font-family: monospace; font-size: 12px; margin-bottom: 10px; }
-        
-        .github-btn { background: #2dba4e; color: white; width: 100%; padding: 14px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 15px; }
-        
-        .step-badge { display: inline-block; background: #333; color: white; padding: 2px 8px; border-radius: 10px; font-size: 11px; margin-right: 5px; vertical-align: middle; }
+        .code-box { background: #222; color: #81e6d9; padding: 10px; border-radius: 6px; font-family: monospace; font-size: 12px; text-align: left; height: 80px; overflow-y: scroll; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <h2>🪄 매직 링크 생성기</h2>
+<div style="text-align: center; margin-bottom: 20px;">
+    <h1>👑 올인원 링크 마스터</h1>
+    <p>이미지 변환부터 코드 생성까지 한 번에 처리하세요.</p>
+</div>
 
-    <div class="guide-box">
-        <strong>📸 1단계: 이미지 준비하기</strong><br>
-        아직 썸네일 이미지가 없으신가요?<br>
-        <a href="./maker.html" target="_blank">👉 여기를 눌러 이미지 변환기(Maker)</a>에서<br>
-        세로 이미지를 가로형으로 변환 후 다운로드하세요.
-    </div>
-
-    <div class="input-group">
-        <label><span class="step-badge">STEP 2</span>폴더 이름 (영문/숫자)</label>
-        <input type="text" id="folderName" placeholder="예: video1, event_new">
-        <p style="font-size:12px; color:#888; margin-top:4px;">* 이 이름이 링크 주소가 됩니다.</p>
-    </div>
-
-    <div class="input-group">
-        <label><span class="step-badge">STEP 3</span>유튜브 영상 링크</label>
-        <input type="text" id="youtubeLink" placeholder="https://youtu.be/...">
-    </div>
-
-    <div class="input-group">
-        <label>제목 (카톡 큰 글씨)</label>
-        <input type="text" id="ogTitle" placeholder="예: 충격! 왕의 공진단 비밀">
-    </div>
-
-    <div class="input-group">
-        <label>설명 (카톡 작은 글씨)</label>
-        <input type="text" id="ogDesc" placeholder="예: 클릭해서 확인해보세요">
-    </div>
-
-    <div class="input-group">
-        <label>이미지 파일명</label>
-        <input type="text" id="imgName" value="og_image.jpg">
-    </div>
-
-    <button class="btn-main" onclick="generate()">✨ 링크 생성하기</button>
-
-    <div id="resultArea">
+<div class="container">
+    <div class="input-section">
+        <h2>📝 정보 입력</h2>
         
-        <label>📢 카톡에 공유할 최종 링크</label>
-        <div class="final-link-box">
-            <div id="shareLinkDisplay" class="final-link-text">https://...</div>
-            <div style="text-align: right; margin-top:10px;">
-                <button class="btn-sub" onclick="copyShareLink()">🔗 링크 복사</button>
-            </div>
+        <label>1. 세로형 이미지 업로드</label>
+        <div class="file-box" onclick="document.getElementById('imgInput').click()">
+            📂 클릭해서 이미지 선택 (세로형)
         </div>
+        <input type="file" id="imgInput" accept="image/*" style="display: none;">
 
-        <label>💻 깃허브에 붙여넣을 코드</label>
-        <textarea id="finalCode" readonly></textarea>
-        <p style="text-align: center; font-size: 13px; color: #666; margin-bottom: 10px;">위 코드가 자동으로 복사되었습니다!</p>
+        <label>2. 폴더 이름 (영문/숫자)</label>
+        <input type="text" id="folderName" placeholder="예: event1">
+        <p style="font-size:12px; color:#888;">* 이 이름이 링크 주소가 됩니다.</p>
 
-        <button class="github-btn" onclick="goToGithub()">🚀 깃허브 가서 만들기</button>
+        <label>3. 유튜브 영상 링크</label>
+        <input type="text" id="youtubeLink" placeholder="https://youtu.be/...">
+
+        <label>4. 제목 (카톡 큰 글씨)</label>
+        <input type="text" id="ogTitle" placeholder="영상 제목 입력">
+
+        <label>5. 설명 (카톡 작은 글씨)</label>
+        <input type="text" id="ogDesc" placeholder="영상 설명 입력">
+
+        <button class="btn-action btn-blue" onclick="processAll()">⚡ 변환 및 코드 생성</button>
+    </div>
+
+    <div class="preview-section">
+        <h2>👀 미리보기 & 다운로드</h2>
+        
+        <canvas id="canvas" width="1200" height="630"></canvas>
+        <p id="waitMsg" style="color:#999;">왼쪽에서 정보를 입력하고<br>버튼을 눌러주세요.</p>
+
+        <div id="resultArea">
+            <a id="downloadLink" class="btn-action btn-dark" style="display:block; text-decoration:none; line-height: 20px;">
+                💾 1. 변환된 이미지 다운로드
+            </a>
+
+            <div style="margin-top: 20px; text-align: left;">
+                <label>📋 2. 생성된 코드 (자동 복사됨)</label>
+                <div id="codeDisplay" class="code-box"></div>
+            </div>
+
+            <button class="btn-action btn-green" onclick="goToGithub()">
+                🚀 3. 깃허브 가서 붙여넣기
+            </button>
+            
+            <p style="font-size:12px; color:#666; margin-top:10px;">
+                * 깃허브에서 <strong>[Ctrl+V]</strong>로 코드를 붙여넣고,<br>
+                방금 다운로드한 <strong>이미지도 같이 업로드</strong> 해주세요.
+            </p>
+        </div>
     </div>
 </div>
 
 <script>
-    function generate() {
+    const imgInput = document.getElementById('imgInput');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    let isImageReady = false;
+
+    // 이미지 선택 시 미리보기 처리
+    imgInput.addEventListener('change', function(e) {
+        if(e.target.files && e.target.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = function() {
+                    drawCanvas(img);
+                    isImageReady = true;
+                    document.querySelector('.file-box').innerText = "✅ " + e.target.files[0].name;
+                }
+                img.src = event.target.result;
+            }
+            reader.readAsDataURL(e.target.files[0]);
+        }
+    });
+
+    function drawCanvas(img) {
+        // 배경 블러 처리 및 합성 로직
+        const cw = canvas.width; const ch = canvas.height;
+        const scaleBg = Math.max(cw / img.width, ch / img.height);
+        const bgW = img.width * scaleBg; const bgH = img.height * scaleBg;
+        
+        ctx.filter = 'blur(20px) brightness(0.7)';
+        ctx.drawImage(img, (cw - bgW) / 2, (ch - bgH) / 2, bgW, bgH);
+        
+        ctx.filter = 'none';
+        const scaleFg = Math.min(ch / img.height, (cw * 0.9) / img.width);
+        const fgW = img.width * scaleFg; const fgH = img.height * scaleFg;
+        
+        ctx.shadowColor = "rgba(0,0,0,0.5)"; ctx.shadowBlur = 20;
+        ctx.drawImage(img, (cw - fgW) / 2, (ch - fgH) / 2, fgW, fgH);
+        
+        document.getElementById('waitMsg').style.display = 'none';
+    }
+
+    function processAll() {
         const folder = document.getElementById('folderName').value.trim();
         const youtube = document.getElementById('youtubeLink').value.trim();
         const title = document.getElementById('ogTitle').value.trim();
         const desc = document.getElementById('ogDesc').value.trim();
-        const img = document.getElementById('imgName').value.trim();
 
-        if(!folder || !youtube) { alert('폴더 이름과 유튜브 링크를 꼭 입력해주세요!'); return; }
+        if(!isImageReady) { alert('이미지를 먼저 업로드해주세요!'); return; }
+        if(!folder || !youtube) { alert('폴더 이름과 유튜브 링크를 입력해주세요!'); return; }
 
-        // 주소 자동 감지 로직
-        const baseUrl = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
-        const finalShareLink = baseUrl + folder + '/';
+        // 1. 이미지 다운로드 링크 생성
+        const dataURL = canvas.toDataURL('image/jpeg', 0.9);
+        const downloadBtn = document.getElementById('downloadLink');
+        downloadBtn.href = dataURL;
+        downloadBtn.download = 'og_image.jpg'; // 파일명 고정
 
-        // HTML 템플릿
+        // 2. HTML 코드 생성
         const htmlCode = `<!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -125,38 +166,28 @@
     <meta property="og:type" content="website">
     <meta property="og:title" content="${title}">
     <meta property="og:description" content="${desc}">
-    <meta property="og:image" content="./${img}">
+    <meta property="og:image" content="./og_image.jpg">
     <meta http-equiv="refresh" content="0; url=${youtube}">
     <title>Redirecting...</title>
-    <script type="text/javascript">
-        window.location.href = "${youtube}";
-    <\/script>
+    <script type="text/javascript">window.location.href = "${youtube}";<\/script>
 </head>
-<body>
-    <p>이동 중...</p>
-</body>
+<body><p>이동 중...</p></body>
 </html>`;
 
-        document.getElementById('shareLinkDisplay').innerText = finalShareLink;
-        document.getElementById('finalCode').value = htmlCode;
-        document.getElementById('resultArea').style.display = 'block';
-
+        document.getElementById('codeDisplay').innerText = htmlCode;
+        
+        // 3. 클립보드 복사
         navigator.clipboard.writeText(htmlCode);
-        alert('생성 완료! \n아래에서 [최종 공유 링크]를 확인하세요.');
-    }
-
-    function copyShareLink() {
-        const linkText = document.getElementById('shareLinkDisplay').innerText;
-        navigator.clipboard.writeText(linkText).then(() => {
-            alert('카톡 공유용 링크가 복사되었습니다!');
-        });
+        
+        // 4. 결과창 표시
+        document.getElementById('resultArea').style.display = 'block';
+        alert('완료되었습니다!\n1. 이미지 다운로드 버튼 클릭\n2. 깃허브로 이동 버튼 클릭');
     }
 
     function goToGithub() {
         const folder = document.getElementById('folderName').value.trim();
         const repoPath = window.location.pathname.split('/')[1]; 
         const user = window.location.hostname.split('.')[0];
-        
         const targetUrl = `https://github.com/${user}/${repoPath}/new/main/?filename=${folder}/index.html`;
         window.open(targetUrl, '_blank');
     }
