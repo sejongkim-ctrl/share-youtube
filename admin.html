@@ -3,73 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🔗 링크 생성 마법사</title>
+    <title>🔗 링크 생성 마법사 V2</title>
     <style>
-        body { font-family: 'Pretendard', sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f9f9f9; }
-        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        h2 { text-align: center; color: #333; }
-        label { display: block; margin-top: 15px; font-weight: bold; color: #555; }
-        input, textarea { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
-        .btn-group { display: flex; gap: 10px; margin-top: 20px; }
-        button { flex: 1; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        .btn-copy { background: #fee500; color: #3c1e1e; } /* 카카오 컬러 */
-        .btn-go { background: #2dba4e; color: white; } /* 깃허브 컬러 */
+        body { font-family: 'Pretendard', sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f0f2f5; }
+        .card { background: white; padding: 25px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        h2 { text-align: center; color: #1a1a1a; margin-bottom: 30px; }
         
-        #resultArea { margin-top: 20px; display: none; }
-        textarea#finalCode { height: 150px; background: #333; color: #fff; font-family: monospace; font-size: 12px; }
-        .guide { font-size: 13px; color: #666; background: #eee; padding: 10px; border-radius: 6px; margin-bottom: 20px; }
+        .input-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; color: #444; font-size: 14px; }
+        input, textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 15px; transition: 0.2s; }
+        input:focus { border-color: #007aff; outline: none; }
+        
+        /* 버튼 스타일 */
+        .btn-main { width: 100%; padding: 16px; background: #007aff; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn-main:hover { background: #0056b3; }
+        
+        .btn-sub { padding: 8px 12px; background: #eee; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; color: #555; }
+
+        /* 결과 영역 (숨김) */
+        #resultArea { margin-top: 30px; padding-top: 20px; border-top: 2px dashed #eee; display: none; }
+        
+        .final-link-box { background: #e9f5ff; padding: 15px; border-radius: 8px; border: 1px solid #cce5ff; margin-bottom: 20px; }
+        .final-link-text { font-family: monospace; color: #0056b3; word-break: break-all; font-weight: bold; }
+        
+        textarea#finalCode { height: 100px; background: #222; color: #81e6d9; font-family: monospace; font-size: 12px; margin-bottom: 10px; }
+        
+        .github-btn { background: #2dba4e; color: white; width: 100%; padding: 14px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 15px; }
+        
+        .step-badge { display: inline-block; background: #333; color: white; padding: 2px 8px; border-radius: 10px; font-size: 11px; margin-right: 5px; vertical-align: middle; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h2>🪄 링크 생성 마법사</h2>
-    <div class="guide">
-        <strong>[작업 순서]</strong><br>
-        1. <a href="./maker.html" target="_blank">이미지 변환기</a>에서 썸네일(jpg) 만들기<br>
-        2. 아래 빈칸을 채우고 [코드 복사] 클릭<br>
-        3. [깃허브 이동] 버튼 눌러서 업로드
+    <h2>🪄 매직 링크 생성기</h2>
+
+    <div class="input-group">
+        <label><span class="step-badge">STEP 1</span>폴더 이름 (영문/숫자)</label>
+        <input type="text" id="folderName" placeholder="예: event1, video_new">
+        <p style="font-size:12px; color:#888; margin-top:4px;">* 이 이름이 링크 주소가 됩니다.</p>
     </div>
 
-    <label>폴더 이름 (영문/숫자)</label>
-    <input type="text" id="folderName" placeholder="예: event1, video2">
-
-    <label>유튜브 영상 링크</label>
-    <input type="text" id="youtubeLink" placeholder="https://youtu.be/...">
-
-    <label>제목 (카톡에 뜰 큰 글씨)</label>
-    <input type="text" id="ogTitle" placeholder="예: 충격! 왕의 공진단 비밀">
-
-    <label>설명 (카톡에 뜰 작은 글씨)</label>
-    <input type="text" id="ogDesc" placeholder="예: 클릭해서 확인해보세요">
-
-    <label>이미지 파일명 (확장자 포함)</label>
-    <input type="text" id="imgName" value="og_image.jpg" placeholder="og_image.jpg">
-
-    <div class="btn-group">
-        <button class="btn-copy" onclick="generateAndCopy()">📋 코드 복사하기</button>
+    <div class="input-group">
+        <label><span class="step-badge">STEP 2</span>유튜브 영상 링크</label>
+        <input type="text" id="youtubeLink" placeholder="https://youtu.be/...">
     </div>
+
+    <div class="input-group">
+        <label>제목 (카톡 큰 글씨)</label>
+        <input type="text" id="ogTitle" placeholder="예: 충격! 왕의 공진단 비밀">
+    </div>
+
+    <div class="input-group">
+        <label>설명 (카톡 작은 글씨)</label>
+        <input type="text" id="ogDesc" placeholder="예: 클릭해서 확인해보세요">
+    </div>
+
+    <div class="input-group">
+        <label>이미지 파일명</label>
+        <input type="text" id="imgName" value="og_image.jpg">
+    </div>
+
+    <button class="btn-main" onclick="generate()">✨ 링크 생성하기</button>
 
     <div id="resultArea">
-        <label>생성된 코드 (복사됨!)</label>
-        <textarea id="finalCode" readonly></textarea>
-        <div class="btn-group">
-            <button class="btn-go" onclick="goToGithub()">🚀 깃허브 가서 만들기</button>
+        
+        <label>📢 카톡에 공유할 최종 링크</label>
+        <div class="final-link-box">
+            <div id="shareLinkDisplay" class="final-link-text">https://...</div>
+            <div style="text-align: right; margin-top:10px;">
+                <button class="btn-sub" onclick="copyShareLink()">🔗 링크 복사</button>
+            </div>
         </div>
+
+        <label>💻 깃허브에 붙여넣을 코드</label>
+        <textarea id="finalCode" readonly></textarea>
+        <p style="text-align: center; font-size: 13px; color: #666; margin-bottom: 10px;">위 코드가 자동으로 복사되었습니다!</p>
+
+        <button class="github-btn" onclick="goToGithub()">🚀 깃허브 가서 만들기</button>
     </div>
 </div>
 
 <script>
-    function generateAndCopy() {
+    function generate() {
         const folder = document.getElementById('folderName').value.trim();
         const youtube = document.getElementById('youtubeLink').value.trim();
         const title = document.getElementById('ogTitle').value.trim();
         const desc = document.getElementById('ogDesc').value.trim();
         const img = document.getElementById('imgName').value.trim();
 
-        if(!folder || !youtube) { alert('폴더 이름과 유튜브 링크는 필수입니다!'); return; }
+        if(!folder || !youtube) { alert('폴더 이름과 유튜브 링크를 꼭 입력해주세요!'); return; }
 
-        // HTML 템플릿 생성
+        // 1. 현재 페이지 주소를 기반으로 '공유용 최종 링크' 계산
+        // 현재 주소가 https://id.github.io/repo/admin.html 일 때
+        // -> https://id.github.io/repo/ 까지를 추출
+        const baseUrl = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
+        const finalShareLink = baseUrl + folder + '/';
+
+        // 2. HTML 코드 생성
         const htmlCode = `<!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -90,37 +121,32 @@
 </body>
 </html>`;
 
+        // 3. 화면에 뿌리기
+        document.getElementById('shareLinkDisplay').innerText = finalShareLink;
         document.getElementById('finalCode').value = htmlCode;
         document.getElementById('resultArea').style.display = 'block';
 
-        // 클립보드 복사
-        navigator.clipboard.writeText(htmlCode).then(() => {
-            alert('코드가 복사되었습니다! \n이제 깃허브에서 붙여넣기만 하세요.');
+        // 4. 코드 클립보드 자동 복사
+        navigator.clipboard.writeText(htmlCode);
+        alert('생성 완료! \n아래에서 [최종 공유 링크]를 확인하세요.');
+    }
+
+    // 공유 링크 복사 버튼 기능
+    function copyShareLink() {
+        const linkText = document.getElementById('shareLinkDisplay').innerText;
+        navigator.clipboard.writeText(linkText).then(() => {
+            alert('카톡 공유용 링크가 복사되었습니다!');
         });
     }
 
+    // 깃허브 이동 기능 (스마트 주소 생성)
     function goToGithub() {
         const folder = document.getElementById('folderName').value.trim();
-        // 새 파일을 만드는 깃허브 주소로 바로 이동 (URL 트릭)
-        // 본인의 저장소 주소로 자동 연결되게 하려면 아래 주소를 수정할 필요 없이 현재 페이지 기준 상대경로 사용 가능하지만,
-        // 확실하게 하기 위해 리포지토리 URL 구조를 활용합니다.
+        const repoPath = window.location.pathname.split('/')[1]; 
+        const user = window.location.hostname.split('.')[0];
         
-        // *주의* 아래 주소 형식은 사용자의 리포지토리 URL 패턴을 따릅니다.
-        // 현재 페이지 URL에서 github.io 부분을 github.com으로 바꾸고 /new/main/ 경로를 추가합니다.
-        
-        const currentUrl = window.location.href;
-        // 예: https://id.github.io/repo/admin.html -> https://github.com/id/repo/new/main/
-        
-        // 간단하게 리포지토리 루트의 '파일 생성' 페이지로 보냅니다.
-        // 사용자가 직접 주소를 넣어야 하는 번거로움을 줄이기 위해 window.open을 씁니다.
-        // 다만 정확한 리포지토리 주소를 자바스크립트로 추적하기 어려우면
-        // 사용자가 직접 깃허브 탭을 열게 해도 됩니다. 여기서는 스마트하게 유추해봅니다.
-        
-        const repoPath = window.location.pathname.split('/')[1]; // 저장소 이름
-        const user = window.location.hostname.split('.')[0]; // 아이디
-        
+        // 깃허브 '새 파일 만들기' 페이지로 바로 이동
         const targetUrl = `https://github.com/${user}/${repoPath}/new/main/?filename=${folder}/index.html`;
-        
         window.open(targetUrl, '_blank');
     }
 </script>
